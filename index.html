@@ -1,18 +1,157 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="zh-CN">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>my-first-website</title>
-  <LINK href="styles.css" rel="stylesheet" type="text/css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BTC / ETH 专业交易监控终端</title>
+  <meta name="description" content="支持多交易所、WebSocket流式刷新、联动图表和自定义预警的 BTC / ETH 专业交易监控终端。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="app.js" defer></script>
 </head>
-
 <body>
+  <div class="app-shell">
+    <header class="hero glass-panel">
+      <div>
+        <p class="eyebrow">Professional Crypto Trading Terminal</p>
+        <h1>BTC / ETH 专业交易监控终端</h1>
+        <p class="hero-copy">
+          多交易所切换、真实 K 线、MACD / RSI / KDJ、持仓量、资金费率、期权执行价分布、独立经济日历聚合、WebSocket 流式刷新与自定义预警，面向盘中观察与研究复盘。
+        </p>
+        <div class="hero-meta">
+          <span class="pill" id="dataModePill">初始化中</span>
+          <span class="pill subtle" id="wsStatusPill">WS 未连接</span>
+          <span class="hero-status" id="lastUpdatedLabel">等待首次数据…</span>
+        </div>
+      </div>
+      <div class="control-panel">
+        <label>
+          <span>交易所</span>
+          <select id="exchangeSelect">
+            <option value="coinbase">Coinbase</option>
+            <option value="binance">Binance</option>
+            <option value="okx">OKX</option>
+            <option value="bybit">Bybit</option>
+          </select>
+        </label>
+        <label>
+          <span>监控标的</span>
+          <select id="symbolSelect">
+            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
+          </select>
+        </label>
+        <label>
+          <span>时间周期</span>
+          <select id="intervalSelect">
+            <option value="15m">15m</option>
+            <option value="1h" selected>1H</option>
+            <option value="4h">4H</option>
+            <option value="1d">1D</option>
+          </select>
+        </label>
+        <div class="action-row">
+          <button class="ghost-button" id="refreshButton">立即拉取快照</button>
+          <button class="primary-button" id="copyDeployButton">复制部署命令</button>
+        </div>
+      </div>
+    </header>
 
-<img src="https://octodex.github.com/images/daftpunktocat-thomas.gif" id="octocat" alt="octocat-gif" />
+    <section class="top-grid">
+      <article class="glass-panel market-card selectable-card active" data-symbol-card="BTC">
+        <div class="market-card__header"><div><span class="coin-tag">BTC</span><h2>Bitcoin</h2></div><strong class="market-price" id="btcPrice">--</strong></div>
+        <div class="market-stats">
+          <div><span>24H</span><strong id="btcChange">--</strong></div>
+          <div><span>High</span><strong id="btcHigh">--</strong></div>
+          <div><span>Low</span><strong id="btcLow">--</strong></div>
+          <div><span>Vol</span><strong id="btcVolume">--</strong></div>
+        </div>
+      </article>
+      <article class="glass-panel market-card selectable-card" data-symbol-card="ETH">
+        <div class="market-card__header"><div><span class="coin-tag eth">ETH</span><h2>Ethereum</h2></div><strong class="market-price" id="ethPrice">--</strong></div>
+        <div class="market-stats">
+          <div><span>24H</span><strong id="ethChange">--</strong></div>
+          <div><span>High</span><strong id="ethHigh">--</strong></div>
+          <div><span>Low</span><strong id="ethLow">--</strong></div>
+          <div><span>Vol</span><strong id="ethVolume">--</strong></div>
+        </div>
+      </article>
+      <article class="glass-panel status-card">
+        <div class="panel-title-row"><div><p class="panel-kicker">Execution View</p><h2>运行状态</h2></div><span class="pill subtle" id="refreshCountdown">--</span></div>
+        <ul class="signal-list compact-list">
+          <li><span>已选市场</span><strong id="selectedMarketLabel">--</strong></li>
+          <li><span>数据源</span><strong id="sourceSummary">--</strong></li>
+          <li><span>流式通道</span><strong id="streamSummary">--</strong></li>
+          <li><span>经济日历</span><strong id="calendarMode">独立服务</strong></li>
+        </ul>
+      </article>
+    </section>
 
-<!-- Change this code here by copy and pasting your template on line 15 -->
-<p>Welcome to your first GitHub Pages website!</p>
+    <main class="dashboard-grid">
+      <section class="main-column">
+        <article class="glass-panel chart-card">
+          <div class="panel-title-row"><div><p class="panel-kicker">Price Structure</p><h2 id="pricePanelTitle">K 线主图</h2></div><span class="pill" id="rangeSummary">--</span></div>
+          <div id="candlestickChart" class="chart-surface tall"></div>
+          <div id="volumeChart" class="chart-surface compact"></div>
+        </article>
+        <article class="glass-panel chart-card">
+          <div class="panel-title-row"><div><p class="panel-kicker">Indicator Stack</p><h2>MACD / RSI / KDJ</h2></div><span class="pill subtle">多图联动十字线</span></div>
+          <div class="indicator-grid-charts">
+            <div id="macdChart" class="chart-surface indicator"></div>
+            <div id="rsiChart" class="chart-surface indicator"></div>
+            <div id="kdjChart" class="chart-surface indicator"></div>
+          </div>
+        </article>
+      </section>
 
+      <aside class="side-column">
+        <article class="glass-panel stat-card-grid">
+          <div class="mini-stat"><span>现价</span><strong id="selectedPrice">--</strong><p id="selectedChange">--</p></div>
+          <div class="mini-stat"><span>持仓量</span><strong id="selectedOI">--</strong><p>实时 / 近似值</p></div>
+          <div class="mini-stat"><span>Funding</span><strong id="selectedFunding">--</strong><p>永续资金费率</p></div>
+          <div class="mini-stat"><span>Put / Call</span><strong id="putCallRatio">--</strong><p>Deribit 期权持仓比</p></div>
+        </article>
+
+        <article class="glass-panel chart-card">
+          <div class="panel-title-row"><div><p class="panel-kicker">Derivatives Flow</p><h2>持仓量结构</h2></div><span class="pill subtle">OI Term Structure</span></div>
+          <div id="oiChart" class="chart-surface medium"></div>
+        </article>
+
+        <article class="glass-panel chart-card">
+          <div class="panel-title-row"><div><p class="panel-kicker">Options Surface</p><h2>期权执行价分布</h2></div><span class="pill subtle">Deribit</span></div>
+          <div id="optionsDistribution" class="live-bars"></div>
+        </article>
+
+        <article class="glass-panel alert-panel">
+          <div class="panel-title-row"><div><p class="panel-kicker">Custom Alerts</p><h2>预警规则</h2></div><span class="pill subtle">本地执行</span></div>
+          <div class="alert-config-grid">
+            <label><span>RSI 高位阈值</span><input id="rsiUpperInput" type="number" value="70" min="1" max="100" /></label>
+            <label><span>RSI 低位阈值</span><input id="rsiLowerInput" type="number" value="30" min="1" max="100" /></label>
+            <label><span>Funding 异常 %</span><input id="fundingThresholdInput" type="number" value="0.05" step="0.01" min="0" /></label>
+            <label><span>OI 跳升阈值 %</span><input id="oiJumpInput" type="number" value="8" step="0.5" min="0" /></label>
+          </div>
+          <button class="ghost-button full-width" id="saveAlertsButton">保存预警规则</button>
+          <ul class="signal-list compact-list" id="alertsList"></ul>
+        </article>
+
+        <article class="glass-panel chart-card">
+          <div class="panel-title-row"><div><p class="panel-kicker">Macro Watch</p><h2>经济日历聚合</h2></div><span class="pill subtle" id="calendarSourcePill">aggregator</span></div>
+          <div class="calendar-list" id="calendarList"></div>
+        </article>
+
+        <article class="glass-panel deployment-card">
+          <div class="panel-title-row"><div><p class="panel-kicker">Deploy & Preview</p><h2>本地预览 / 一键部署</h2></div></div>
+          <ul class="deployment-list">
+            <li><code>npm start</code><span>本地运行页面 + API + WebSocket</span></li>
+            <li><code>vercel --prod</code><span>部署到 Vercel</span></li>
+            <li><code>netlify deploy --prod</code><span>部署到 Netlify</span></li>
+          </ul>
+        </article>
+      </aside>
+    </main>
+  </div>
 </body>
 </html>

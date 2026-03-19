@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "mode": "demo-fallback",
+    "warning": "Unable to reach upstream exchanges from the current environment.",
+    "interval": "1h",
+    "selectedSymbol": "BTC"
+  },
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "overview": {
+    "BTC": {
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "price": 68420,
+      "changePct": 3.82,
+      "volume24h": 29482.43,
+      "high24h": 69140,
+      "low24h": 65980
+    },
+    "ETH": {
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "price": 3540,
+      "changePct": 2.16,
+      "volume24h": 402193.18,
+      "high24h": 3598,
+      "low24h": 3412
+    }
+  },
+  "selectedMarket": {
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "price": 68420,
+    "changePct": 3.82,
+    "volume24h": 29482.43,
+    "high24h": 69140,
+    "low24h": 65980,
+    "fundingRate": 0.00012,
+    "oiTotal": 1843200000,
+    "basis": 128.4,
+    "putCallRatio": 0.83
+  },
+  "candles": [
+    {"time": 1710800000, "open": 64120, "high": 64600, "low": 63820, "close": 64340, "volume": 1234},
+    {"time": 1710803600, "open": 64340, "high": 64880, "low": 64260, "close": 64770, "volume": 1320},
+    {"time": 1710807200, "open": 64770, "high": 65110, "low": 64520, "close": 64860, "volume": 1211},
+    {"time": 1710810800, "open": 64860, "high": 65200, "low": 64610, "close": 64910, "volume": 1111},
+    {"time": 1710814400, "open": 64910, "high": 65490, "low": 64840, "close": 65380, "volume": 1567},
+    {"time": 1710818000, "open": 65380, "high": 65770, "low": 65040, "close": 65240, "volume": 1800},
+    {"time": 1710821600, "open": 65240, "high": 66080, "low": 65190, "close": 65960, "volume": 1942},
+    {"time": 1710825200, "open": 65960, "high": 66400, "low": 65820, "close": 66110, "volume": 2012},
+    {"time": 1710828800, "open": 66110, "high": 66580, "low": 65910, "close": 66020, "volume": 1431},
+    {"time": 1710832400, "open": 66020, "high": 66890, "low": 65940, "close": 66740, "volume": 2301},
+    {"time": 1710836000, "open": 66740, "high": 67010, "low": 66400, "close": 66680, "volume": 1890},
+    {"time": 1710839600, "open": 66680, "high": 67420, "low": 66590, "close": 67240, "volume": 2510},
+    {"time": 1710843200, "open": 67240, "high": 67680, "low": 67110, "close": 67590, "volume": 2160},
+    {"time": 1710846800, "open": 67590, "high": 67980, "low": 67320, "close": 67710, "volume": 1660},
+    {"time": 1710850400, "open": 67710, "high": 68220, "low": 67620, "close": 68080, "volume": 1911},
+    {"time": 1710854000, "open": 68080, "high": 68640, "low": 67920, "close": 68420, "volume": 2420}
+  ],
+  "oiByInstrument": [
+    {"label": "PERP", "value": 482000000},
+    {"label": "MAR", "value": 351000000},
+    {"label": "JUN", "value": 298000000},
+    {"label": "SEP", "value": 264000000},
+    {"label": "DEC", "value": 221000000}
+  ],
+  "optionsDistribution": [
+    {"strike": 58000, "value": 1280, "normalized": 0.28, "isAtMoney": false},
+    {"strike": 62000, "value": 1960, "normalized": 0.43, "isAtMoney": false},
+    {"strike": 66000, "value": 3190, "normalized": 0.70, "isAtMoney": false},
+    {"strike": 68000, "value": 4540, "normalized": 1, "isAtMoney": true},
+    {"strike": 70000, "value": 3920, "normalized": 0.86, "isAtMoney": false},
+    {"strike": 74000, "value": 2710, "normalized": 0.6, "isAtMoney": false},
+    {"strike": 78000, "value": 1520, "normalized": 0.33, "isAtMoney": false}
+  ],
+  "sources": {
+    "price": "Coinbase Exchange public market data",
+    "derivatives": "Deribit public market data",
+    "calendar": "TradingView Economic Calendar widget"
+  }
+}
